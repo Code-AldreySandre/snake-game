@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Snake Game</title>
+  <style>
+    body {
+      margin: 0;
+      background: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      color: white;
+      font-family: Arial, sans-serif;
+    }
+    canvas {
+      border: 1px solid white;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="game" width="400" height="400"></canvas>
+  <script>
+    const canvas = document.getElementById('game');
+    const context = canvas.getContext('2d');
+
+    const box = 20;
+    let snake = [{ x: 9 * box, y: 10 * box }];
+    let direction = 'RIGHT';
+    let food = {
+      x: Math.floor(Math.random() * 19) * box,
+      y: Math.floor(Math.random() * 19) * box,
+    };
+    let score = 0;
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'ArrowUp' && direction !== 'DOWN') direction = 'UP';
+      if (event.key === 'ArrowDown' && direction !== 'UP') direction = 'DOWN';
+      if (event.key === 'ArrowLeft' && direction !== 'RIGHT') direction = 'LEFT';
+      if (event.key === 'ArrowRight' && direction !== 'LEFT') direction = 'RIGHT';
+    });
+
+    function drawGame() {
+      context.fillStyle = '#000';
+      context.fillRect(0, 0, canvas.width, canvas.height);
+
+      for (let i = 0; i < snake.length; i++) {
+        context.fillStyle = i === 0 ? '#0F0' : '#0A0';
+        context.fillRect(snake[i].x, snake[i].y, box, box);
+      }
+
+      context.fillStyle = '#F00';
+      context.fillRect(food.x, food.y, box, box);
+
+      let snakeX = snake[0].x;
+      let snakeY = snake[0].y;
+
+      if (direction === 'UP') snakeY -= box;
+      if (direction === 'DOWN') snakeY += box;
+      if (direction === 'LEFT') snakeX -= box;
+      if (direction === 'RIGHT') snakeX += box;
+
+      if (snakeX === food.x && snakeY === food.y) {
+        food = {
+          x: Math.floor(Math.random() * 19) * box,
+          y: Math.floor(Math.random() * 19) * box,
+        };
+        score++;
+      } else {
+        snake.pop();
+      }
+
+      let newHead = { x: snakeX, y: snakeY };
+
+      if (
+        snakeX < 0 ||
+        snakeY < 0 ||
+        snakeX >= canvas.width ||
+        snakeY >= canvas.height ||
+        snake.some((segment) => segment.x === snakeX && segment.y === snakeY)
+      ) {
+        clearInterval(game);
+        alert(`Game Over! Score: ${score}`);
+      }
+
+      snake.unshift(newHead);
+    }
+
+    let game = setInterval(drawGame, 100);
+  </script>
+</body>
+</html>
